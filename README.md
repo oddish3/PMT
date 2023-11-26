@@ -1,1 +1,1 @@
-# PMT
+Repository for PMT classification project
