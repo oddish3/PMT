@@ -122,58 +122,58 @@ xtable(metrics_table)
 
 
 ########## not working. bayesian optimmisation script ------
-svm_fun <- function(cost, gamma) {
-  tryCatch({
-    model <- svm(poor_20 ~ ., data = train_data, kernel = "radial",
-                 cost = cost, gamma = gamma, probability = TRUE)
-    
-    val_predictions <- predict(model, val_data, type = "response")
-    cm <- confusionMatrix(val_predictions, val_data$poor_20)
-    precision_val <- cm$byClass['Positive Predictive Value']
-    
-    # Return a very low score if precision is NA
-    if (is.na(precision_val)) return(list(Score = -0.5, Pred = val_predictions))
-    return(list(Score = precision_val, Pred = val_predictions))
-  }, error = function(e) {
-    # Return a very low score in case of error
-    return(list(Score = -1, Pred = NULL))
-  })
-}
-
-# Narrowing down the hyperparameter ranges based on typical values for SVM
-bounds <- list(cost = c(0.1, 5), gamma = c(0.01, 0.5))
-
-# Run Bayesian Optimization again
-svm_opt <- BayesianOptimization(svm_fun, 
-                                bounds = bounds, 
-                                init_points = 5, 
-                                n_iter = 20)
-# Train the final SVM model with the best parameters
-best_svm <- svm(poor_20 ~ ., data = train_data, kernel = "radial",
-                cost = svm_opt$Best_Par$cost, 
-                gamma = svm_opt$Best_Par$gamma, 
-                probability = TRUE)
-
-test_predictions <- predict(best_svm, test_data, type = "response")
-
-# Confusion Matrix
-cm <- confusionMatrix(test_predictions, test_data$poor_20)
-
-# Calculating metrics
-recall <- cm$byClass['Sensitivity']
-precision <- cm$byClass['Positive Predictive Value']
-f1_score <- 2 * ((precision * recall) / (precision + recall))
-
-# Output the metrics
-print(paste("Recall:", recall))
-print(paste("Precision:", precision))
-print(paste("F1 Score:", f1_score))
-
-# PR-AUC
-prob_predictions <- predict(best_svm, test_data, type = "probabilities")[,2]
-pr <- pr.curve(scores.class0 = prob_predictions, weights.class0 = test_data$poor_20 == "1",
-               curve = TRUE)
-plot(pr)
+# svm_fun <- function(cost, gamma) {
+#   tryCatch({
+#     model <- svm(poor_20 ~ ., data = train_data, kernel = "radial",
+#                  cost = cost, gamma = gamma, probability = TRUE)
+#     
+#     val_predictions <- predict(model, val_data, type = "response")
+#     cm <- confusionMatrix(val_predictions, val_data$poor_20)
+#     precision_val <- cm$byClass['Positive Predictive Value']
+#     
+#     # Return a very low score if precision is NA
+#     if (is.na(precision_val)) return(list(Score = -0.5, Pred = val_predictions))
+#     return(list(Score = precision_val, Pred = val_predictions))
+#   }, error = function(e) {
+#     # Return a very low score in case of error
+#     return(list(Score = -1, Pred = NULL))
+#   })
+# }
+# 
+# # Narrowing down the hyperparameter ranges based on typical values for SVM
+# bounds <- list(cost = c(0.1, 5), gamma = c(0.01, 0.5))
+# 
+# # Run Bayesian Optimization again
+# svm_opt <- BayesianOptimization(svm_fun, 
+#                                 bounds = bounds, 
+#                                 init_points = 5, 
+#                                 n_iter = 20)
+# # Train the final SVM model with the best parameters
+# best_svm <- svm(poor_20 ~ ., data = train_data, kernel = "radial",
+#                 cost = svm_opt$Best_Par$cost, 
+#                 gamma = svm_opt$Best_Par$gamma, 
+#                 probability = TRUE)
+# 
+# test_predictions <- predict(best_svm, test_data, type = "response")
+# 
+# # Confusion Matrix
+# cm <- confusionMatrix(test_predictions, test_data$poor_20)
+# 
+# # Calculating metrics
+# recall <- cm$byClass['Sensitivity']
+# precision <- cm$byClass['Positive Predictive Value']
+# f1_score <- 2 * ((precision * recall) / (precision + recall))
+# 
+# # Output the metrics
+# print(paste("Recall:", recall))
+# print(paste("Precision:", precision))
+# print(paste("F1 Score:", f1_score))
+# 
+# # PR-AUC
+# prob_predictions <- predict(best_svm, test_data, type = "probabilities")[,2]
+# pr <- pr.curve(scores.class0 = prob_predictions, weights.class0 = test_data$poor_20 == "1",
+#                curve = TRUE)
+# plot(pr)
 
 
 
