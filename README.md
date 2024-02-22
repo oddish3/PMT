@@ -1,6 +1,6 @@
 Repository for PMT classification project
 Load each script to wd where Brown_Ravallion_vandeWalle_PMT.dta is
-creates PMT_CLEAN_SY.dta , PMT_CLEAN_SY1.dta , PMT_CLEAN_SY2.dta
+creates PMT_CLEAN_SY.dta , PMT_CLEAN_SY1.dta , PMT_CLEAN_SY2.dta in ../dta_files
 
 Cleaning -> Regression -> SVM 
 
