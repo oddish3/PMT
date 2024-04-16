@@ -1,0 +1,117 @@
+#----
+# A Poor Means Test Replication Study
+#
+#Author : Sol Yates
+
+rm(list=ls())
+setwd("/home/oddish3/Documents/R_folder/UG/PMT/Scripts")
+
+# Required libraries
+library(haven)
+library(magrittr)
+library(dplyr)
+library(ggplot2)
+library(ROSE)
+library(smotefamily)
+
+data <- read_dta("../dta_files/PMT_CLEAN_SY2.dta")
+data <- data %>% select(c("poor_20", "toilet_pit", "wall_finish",
+                          "fuel_elecgas", "fuel_charcoal","urban", "female_head",
+                          "edu_head_primary", "edu_head_secondary", "div_sep_head", "widow_head", 
+                          "work_paid_head", "work_selfemp_nonf_head"))#, "muslim", "christian"))
+
+data$poor_20 <- as.factor(as.character(data$poor_20)) 
+
+# Fit the linear model
+lm_model <- lm(poor_20 ~ toilet_pit + wall_finish + fuel_elecgas + fuel_charcoal + urban +
+                 female_head + edu_head_primary + edu_head_secondary + div_sep_head + 
+                 widow_head + work_paid_head + work_selfemp_nonf_head, 
+               data = data)
+
+# Predicted values
+predictions <- predict(lm_model, data)
+
+plot_data <- data.frame(Actual = data$poor_20, Predicted = predictions)
+
+# Plot using ggplot
+ggplot(plot_data, aes(x = Predicted, y = Actual)) +
+  geom_point(colour = "blue") +  # Add points
+  geom_smooth(method = "lm", se = FALSE, color = "green") +  # Add a regression line
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +  # y=x line
+  labs(title = "Predicted vs. Actual Values", x = "Predicted Values", y = "Actual Values") +
+  theme_minimal()
+
+dev.off()
+
+## class imbalance -----
+table(data$poor_20)
+original_data <- data 
+
+# over sampling
+set.seed(123)  # For reproducibility
+over_sampled_data <- ovun.sample(poor_20 ~ ., data = original_data, method = "over", N = max(table(original_data$poor_20)) * 2)$data
+table(over_sampled_data$poor_20)
+# under sampling
+under_sampled_data <- ovun.sample(poor_20 ~ ., data = original_data, method = "under", N = min(table(original_data$poor_20)) * 2)$data
+table(under_sampled_data$poor_20)
+
+saveRDS(under_sampled_data, "../dta_files/data_under_sampled.rds")
+saveRDS(over_sampled_data, "../dta_files/data_over_sampled.rds")
+
+# SMOTE
+
+# data$poor_20 <- as.factor(data$poor_20)  # Ensure the target is a factor
+
+# Separate predictors and target
+X <- data[, setdiff(names(data), "poor_20")]
+target <- data$poor_20
+
+# Apply SMOTE for oversampling to balance the classes
+genData <- SMOTE(X = X, target = target, K = 5, dup_size = 1)
+
+# Use the 'data' component from genData which contains the balanced dataset
+balanced_df <- genData$data
+balanced_df$class <- as.factor(balanced_df$class)
+
+saveRDS(balanced_df, "../dta_files/data_smote.rds")
+
+#tables of each class and sampling technique
+table(original_data$poor_20)
+table(over_sampled_data$poor_20)
+table(under_sampled_data$poor_20)
+table(balanced_df$class)
+
+## PCA ---------------
+class(data$poor_20)
+# Remove the target variable before performing PCA
+data_pca <- data %>% select(-poor_20)
+
+# Perform PCA - remember to scale the data if needed
+pca_result <- prcomp(data_pca, center = TRUE, scale. = TRUE)
+
+# View the summary of PCA results
+summary(pca_result)
+
+# Plot the cumulative proportion of variance explained
+plot(pca_result$sdev^2 / sum(pca_result$sdev^2), type = 'b', xlab = "Principal Component",
+     ylab = "Proportion of Variance Explained", ylim = c(0, 1), main = "Scree Plot")
+
+# Cumulative sum of the variance explained
+cumulative_variance <- cumsum(pca_result$sdev^2 / sum(pca_result$sdev^2))
+plot(cumulative_variance, xlab = "Number of Principal Components", ylab = "Cumulative Proportion of Variance Explained",
+     type = 'b', main = "Cumulative Scree Plot")
+abline(h = 0.8, col = "red", lty = 2)  # Line at 80% variance explained for reference
+
+# Extracting the first 8 principal components
+pc_scores <- pca_result$x[, 1:8]
+
+# Creating a new dataframe with PC scores
+pc_data <- as.data.frame(pc_scores)
+
+# Adding the target variable back to the dataframe
+pc_data$poor_20 <- data$poor_20
+
+saveRDS(pc_data, "../dta_files/pc_data.rds")
+
+
+
