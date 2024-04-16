@@ -3,7 +3,7 @@
     "path": "~/Documents/R_folder/PMT/code/REPLICATION - SVM.R",
     "project_path": "code/REPLICATION - SVM.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "1198748107",
     "contents": "",
     "dirty": false,
     "created": 1713293717533.0,
@@ -12,15 +12,16 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "85,0",
-        "scrollLine": "64"
+        "cursorPosition": "26,0",
+        "scrollLine": "12",
+        "marks": "<:27,0\n>:31,-1"
     },
     "folds": "",
-    "lastKnownWriteTime": 1713293744,
+    "lastKnownWriteTime": 1713295711,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1713293744839,
+    "last_content_update": 1713295711989,
     "read_only": false,
     "read_only_alternatives": []
 }

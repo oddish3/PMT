@@ -116,5 +116,5 @@ predictions <- list()
 #   data[[name]] <- predictions[[name]]
 # }
 data %<>% filter(country == "Uganda") 
-write_dta(data, "data/out/PMT_CLEAN_SY2.dta")
+write_dta(data, "data/out/PMT_CLEAN_UGANDA.dta")
 

@@ -23,12 +23,12 @@ library(dplyr)
 library(xtable)
 library(rBayesianOptimization)
 
-data <- readRDS("data/out/data_over_sampled.rds")
-# data <- data %>% select(c("poor_20", "toilet_pit", "wall_finish",
-#                            "fuel_elecgas", "fuel_charcoal","urban", "female_head",
-#                            "edu_head_primary", "edu_head_secondary", "div_sep_head", "widow_head", 
-#                            "work_paid_head", "work_selfemp_nonf_head"))#, "muslim", "christian"))
-# 
+data <- read_dta("data/out/PMT_CLEAN_UGANDA.dta")
+# data1 <- readRDS("data/out/data_over_sampled.rds")
+data <- data %>% select(c("poor_20", "toilet_pit", "wall_finish",
+                           "fuel_elecgas", "fuel_charcoal","urban", "female_head",
+                           "edu_head_primary", "edu_head_secondary", "div_sep_head", "widow_head",
+                           "work_paid_head", "work_selfemp_nonf_head"))#, "muslim", "christian"))
 
 set.seed(122)
 # Train/test split 80% train, 20% test
@@ -76,6 +76,7 @@ for (kernel in kernels) {
   metrics_table <- rbind(metrics_table, data.frame(Kernel = kernel, Accuracy = accuracy,
                                                    Precision = precision, sensitivity = sensitivity,
                                                    F1_Score = f1_score, AUC = auc))
+  cm_[kernel] <- cm
 }
 
 # Print the metrics table
