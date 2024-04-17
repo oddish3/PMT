@@ -170,7 +170,6 @@ data %>% group_by(country) %>%
   summarise(weighted_mean_40 = weighted.mean(poor_40, hhweight, na.rm = TRUE),
             weighted_mean_20 = weighted.mean(poor_20, hhweight, na.rm = TRUE))
 
-### function to write to local repo so don't have to upload to git -------------------------------------
 
 write_dta(data, "data/out/PMT_CLEAN_SY.dta")
 

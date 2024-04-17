@@ -1,0 +1,410 @@
+\input{/home/oddish3/Documents/Templates/tex/template0.tex}
+
+\title{Results}
+
+\begin{document}
+\maketitle
+	
+\subsection{Original}
+
+% Confusion Matrix for linear kernel using dataset: data
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:32:32 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 372 &  14 \\ 
+  Class1 & 118 &  29 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for linear Kernel} 
+\end{table}
+
+% Confusion Matrix for radial kernel using dataset: data
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:32:32 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 376 &  10 \\ 
+  Class1 & 119 &  28 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for radial Kernel} 
+\end{table}
+
+% Confusion Matrix for polynomial kernel using dataset: data
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:32:32 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 374 &  12 \\ 
+  Class1 & 120 &  27 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for polynomial Kernel} 
+\end{table}
+
+% Confusion Matrix for sigmoid kernel using dataset: data
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:32:32 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 338 &  48 \\ 
+  Class1 & 119 &  28 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for sigmoid Kernel} 
+\end{table}
+
+\subsection{Undersampling}
+
+
+% Confusion Matrix for linear kernel using dataset: data_under
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:32:50 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 &  73 &  74 \\ 
+  Class1 &  19 & 128 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for linear Kernel} 
+\end{table}
+
+% Confusion Matrix for radial kernel using dataset: data_under
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:32:50 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 &  83 &  64 \\ 
+  Class1 &  28 & 119 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for radial Kernel} 
+\end{table}
+
+% Confusion Matrix for polynomial kernel using dataset: data_under
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:32:50 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 &  68 &  79 \\ 
+  Class1 &  17 & 130 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for polynomial Kernel} 
+\end{table}
+
+% Confusion Matrix for sigmoid kernel using dataset: data_under
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:32:50 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 &  79 &  68 \\ 
+  Class1 &  39 & 108 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for sigmoid Kernel} 
+\end{table}
+
+\subsection{Oversampling}
+
+% Confusion Matrix for linear kernel using dataset: data_over
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:27 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 207 & 179 \\ 
+  Class1 &  68 & 318 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for linear Kernel} 
+\end{table}
+
+% Confusion Matrix for radial kernel using dataset: data_over
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:27 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 215 & 171 \\ 
+  Class1 &  66 & 320 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for radial Kernel} 
+\end{table}
+
+% Confusion Matrix for polynomial kernel using dataset: data_over
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:27 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 206 & 180 \\ 
+  Class1 &  56 & 330 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for polynomial Kernel} 
+\end{table}
+
+% Confusion Matrix for sigmoid kernel using dataset: data_over
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:27 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 209 & 177 \\ 
+  Class1 & 133 & 253 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for sigmoid Kernel} 
+\end{table}
+
+\subsection{Smote}
+
+% Confusion Matrix for linear kernel using dataset: data_smote
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:38 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 207 & 179 \\ 
+  Class1 &  47 & 248 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for linear Kernel} 
+\end{table}
+
+% Confusion Matrix for radial kernel using dataset: data_smote
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:38 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 269 & 117 \\ 
+  Class1 &  99 & 196 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for radial Kernel} 
+\end{table}
+
+% Confusion Matrix for polynomial kernel using dataset: data_smote
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:38 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 268 & 118 \\ 
+  Class1 &  96 & 199 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for polynomial Kernel} 
+\end{table}
+
+% Confusion Matrix for sigmoid kernel using dataset: data_smote
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:38 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 207 & 179 \\ 
+  Class1 &  99 & 196 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for sigmoid Kernel} 
+\end{table}
+
+\subsection{PCA}
+
+% Confusion Matrix for linear kernel using dataset: data_pca
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:41 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 372 &  14 \\ 
+  Class1 & 118 &  29 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for linear Kernel} 
+\end{table}
+
+% Confusion Matrix for radial kernel using dataset: data_pca
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:41 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 376 &  10 \\ 
+  Class1 & 120 &  27 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for radial Kernel} 
+\end{table}
+
+% Confusion Matrix for polynomial kernel using dataset: data_pca
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:41 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 371 &  15 \\ 
+  Class1 & 120 &  27 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for polynomial Kernel} 
+\end{table}
+
+% Confusion Matrix for sigmoid kernel using dataset: data_pca
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:41 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 302 &  84 \\ 
+  Class & 103 &  44 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for sigmoid Kernel} 
+\end{table}
+
+\subsection{Whitening transformation}
+
+
+
+% Confusion Matrix for linear kernel using dataset: data_white
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:46 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 372 &  14 \\ 
+  Class1 & 118 &  29 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for linear Kernel} 
+\end{table}
+
+% Confusion Matrix for radial kernel using dataset: data_white
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:46 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 376 &  10 \\ 
+  Class1 & 120 &  27 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for radial Kernel} 
+\end{table}
+
+% Confusion Matrix for polynomial kernel using dataset: data_white
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:46 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 371 &  15 \\ 
+  Class1 & 120 &  27 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for polynomial Kernel} 
+\end{table}
+
+% Confusion Matrix for sigmoid kernel using dataset: data_white
+% latex table generated in R 4.3.3 by xtable 1.8-4 package
+% Wed Apr 17 14:33:46 2024
+\begin{table}[H]
+\centering
+\begin{tabular}{rrr}
+  \hline
+ & Class0 & Class1 \\ 
+  \hline
+Class0 & 302 &  84 \\ 
+  Class1 & 103 &  44 \\ 
+   \hline
+\end{tabular}
+\caption{Confusion Matrix for sigmoid Kernel} 
+\end{table}
+
+\end{document}
+
+
+

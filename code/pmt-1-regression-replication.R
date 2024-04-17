@@ -115,6 +115,9 @@ predictions <- list()
 # for (name in names(predictions)) {
 #   data[[name]] <- predictions[[name]]
 # }
-data %<>% filter(country == "Uganda") 
+data %<>% filter(country == "Uganda") %>% select(c("poor_20", "toilet_pit", "wall_finish",
+                                                        "fuel_elecgas", "fuel_charcoal","urban", "female_head",
+                                                        "edu_head_primary", "edu_head_secondary", "div_sep_head", "widow_head", 
+                                                        "work_paid_head", "work_selfemp_nonf_head"))#, "muslim", "christian"))
 write_dta(data, "data/out/PMT_CLEAN_UGANDA.dta")
 

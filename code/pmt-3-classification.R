@@ -25,27 +25,47 @@ library(rBayesianOptimization)
 library(kernlab)
 
 data <- read_dta("data/out/PMT_CLEAN_UGANDA.dta")
+data_under <- read_rds("data/out/data_under_sampled.rds")
+data_over <- read_rds("data/out/data_over_sampled.rds")
+data_smote <- read_rds("data/out/data_smote.rds")
+data_pca <- read_rds("data/out/pca_data.rds")
+data_white <- read_rds("data/out/whitened_data.rds")
+
+
 # data1 <- readRDS("data/out/data_over_sampled.rds")
-data <- data %>% select(c("poor_20", "toilet_pit", "wall_finish",
-                           "fuel_elecgas", "fuel_charcoal","urban", "female_head",
-                           "edu_head_primary", "edu_head_secondary", "div_sep_head", "widow_head",
-                           "work_paid_head", "work_selfemp_nonf_head"))#, "muslim", "christian"))
+# data <- data %>% select(c("poor_20", "toilet_pit", "wall_finish",
+#                            "fuel_elecgas", "fuel_charcoal","urban", "female_head",
+#                            "edu_head_primary", "edu_head_secondary", "div_sep_head", "widow_head",
+#                            "work_paid_head", "work_selfemp_nonf_head"))#, "muslim", "christian"))
 
 # Train/test split 80% train, 20% test
-set.seed(122)
 
-data$poor_20 <- factor(data$poor_20, levels = c("0", "1"), labels = c("Class0", "Class1"))
-train_index <- createDataPartition(data$poor_20, p = 0.8, list = FALSE, times = 1)
-train_data <- data[train_index, ]
-test_data <- data[-train_index, ]
+data_model <- function(data) {
+  data$poor_20 <- as.factor(as.character(data$poor_20))
+  data$poor_20 <- factor(data$poor_20, levels = c("0", "1"), labels = c("Class0", "Class1"))
+  set.seed(122)
+  train_index <- createDataPartition(data$poor_20, p = 0.8, list = FALSE, times = 1)
+  train_data <- data[train_index, ]
+  test_data <- data[-train_index, ]
+  return(list(train_data = train_data, test_data = test_data))
+}
+
+data <- data_model(data)
+data_under <- data_model(data_under)
+data_over <- data_model(data_over)
+data_smote <- data_model(data_smote)
+data_pca <- data_model(data_pca)
+data_white <- data_model(data_white)
+
+formula <- poor_20 ~ .
 
 #### SVM --------
 # formula <- poor_20 ~ toilet_pit + wall_finish + fuel_elecgas + fuel_charcoal + urban + 
 #   female_head + edu_head_primary + edu_head_secondary + div_sep_head + widow_head + work_paid_head + work_selfemp_nonf_head
-formula <- poor_20 ~ .
+
 
 # Basic SVM ----
-basic_svm <- function(train_data, test_data) {
+basic_svm <- function(train_data, test_data, formula, output_file = "tex/utils.tex", data_name) {
   # kernels to iterate through
   kernels <- c("linear", "radial", "polynomial", "sigmoid")
   
@@ -82,24 +102,41 @@ basic_svm <- function(train_data, test_data) {
                                                      Precision = precision, Sensitivity = sensitivity,
                                                      F1_Score = f1_score, AUC = auc))
     cm_list[[kernel]] <- cm
-    cm1_list[[kernel]] <- cm1
+    # cm1_list[[kernel]] <- cm1
   }
   
   # Generate LaTeX tables
-  latex_metrics_table <- print(xtable(metrics_table), type = "latex", include.rownames = FALSE)
-  latex_cm_list <- lapply(cm_list, function(cm) print(xtable(cm), type = "latex", include.rownames = TRUE))
+  # latex_metrics_table <- print(xtable(metrics_table), type = "latex", include.rownames = FALSE)
   
+  # Function to save the LaTeX representation of each confusion matrix to a file
+  save_confusion_matrices_to_latex <- function(cm_list, data_name, output_file) {
+    # Check if output file path is provided
+    if (!is.null(output_file)) {
+      # Iterate over cm_list and save each confusion matrix
+      for (kernel in names(cm_list)) {
+        cat(sprintf("\n%% Confusion Matrix for %s kernel using dataset: %s\n", kernel, data_name), file = output_file, append = TRUE)
+        print(xtable(cm_list[[kernel]], caption = sprintf("Confusion Matrix for %s Kernel", kernel)),
+              type = "latex", include.rownames = TRUE, file = output_file, append = TRUE)
+      }
+    }
+  }
+  
+  # Use the function to save confusion matrices
+  save_confusion_matrices_to_latex(cm_list, data_name, output_file)
   # Return all results
-  return(list(metrics_table = latex_metrics_table, confusion_matrices = latex_cm_list))
-  
+  # return(list(metrics_table = latex_metrics_table, confusion_matrices = latex_cm_list))
 }
 
-results <- basic_svm(train_data, test_data)
-
+results <- basic_svm(data[["train_data"]], data[["test_data"]], formula, data_name = "data", output_file = "tex/utils.tex")
+results_under <- basic_svm(data_under[["train_data"]], data_under[["test_data"]], formula, data_name = "data_under", output_file = "tex/utils.tex")
+results_over <- basic_svm(data_over[["train_data"]], data_over[["test_data"]], formula, data_name = "data_over", output_file = "tex/utils.tex")
+results_smote <- basic_svm(data_smote[["train_data"]], data_smote[["test_data"]], formula, data_name = "data_smote", output_file = "tex/utils.tex")
+results_pca <- basic_svm(data_pca[["train_data"]], data_pca[["test_data"]], formula, data_name = "data_pca", output_file = "tex/utils.tex")
+results_white <- basic_svm(data_white[["train_data"]], data_white[["test_data"]], formula, data_name = "data_white", output_file = "tex/utils.tex")
 
 #### radial kernel w some tuning  ----
 
-svm_grid_search <- function(train_data, test_data, formula, hyperparameters, cv_method = "standard") {
+svm_grid_search <- function(train_data, test_data, formula, hyperparameters, cv_method = "standard", output_file = "tex/utils.tex", data_name) {
   if (cv_method == "standard") {
     control_options <- trainControl(method = "cv", number = 10, savePredictions = "final", classProbs = TRUE)
   } else if (cv_method == "repeated") {
@@ -130,12 +167,11 @@ svm_grid_search <- function(train_data, test_data, formula, hyperparameters, cv_
   
   # Create confusion matrix with correct labels
   cm <- table(Actual = test_data$poor_20, Predicted = preds_class)
-  cm1 <- confusionMatrix(preds_class, test_data$poor_20, positive = "Class1")
   
   # Calculate metrics
   accuracy <- sum(diag(cm)) / sum(cm)
-  precision <- cm1$byClass['Pos Pred Value']
-  sensitivity <- cm1$byClass['Sensitivity']
+  precision <- confusionMatrix(preds_class, test_data$poor_20, positive = "Class1")$byClass['Pos Pred Value']
+  sensitivity <- confusionMatrix(preds_class, test_data$poor_20, positive = "Class1")$byClass['Sensitivity']
   f1_score <- 2 * ((precision * sensitivity) / (precision + sensitivity))
   roc_obj <- roc(as.numeric(test_data$poor_20 == "Class1"), as.numeric(preds_class == "Class1"))
   auc <- auc(roc_obj)
@@ -145,12 +181,23 @@ svm_grid_search <- function(train_data, test_data, formula, hyperparameters, cv_
                                                    Precision = precision, Sensitivity = sensitivity,
                                                    F1_Score = f1_score, AUC = auc))
   
-  # Generate LaTeX tables
+  # Function to save the LaTeX representation of each confusion matrix to a file
+  save_confusion_matrices_to_latex <- function(cm, data_name, output_file) {
+    if (!is.null(output_file)) {
+      cat(sprintf("\n%% Confusion Matrix using dataset: %s\n", data_name), file = output_file, append = TRUE)
+      print(xtable(cm, caption = "Confusion Matrix"),
+            type = "latex", include.rownames = TRUE, file = output_file, append = TRUE)
+    }
+  }
+  
+  # Save LaTeX representation of confusion matrix
+  save_confusion_matrices_to_latex(cm, data_name, output_file)
+  
+  # Generate LaTeX tables for metrics
   latex_metrics_table <- print(xtable(metrics_table), type = "latex", include.rownames = FALSE)
-  latex_cm <- print(xtable(cm), type = "latex", include.rownames = TRUE)
   
   # Return all results
-  return(list(metrics_table = latex_metrics_table, confusion_matrix = latex_cm, model = best_svm_model))
+  return(list(metrics_table = latex_metrics_table, confusion_matrix = cm, model = best_svm_model))
 }
 
 # Define hyperparameters and control options
@@ -165,115 +212,109 @@ hyperparameters <- expand.grid(
 # )
 
 # Usage of the function
-results1 <- svm_grid_search(train_data, test_data, formula, hyperparameters, cv_method = "standard")
+results1 <- svm_grid_search(data[["train_data"]], data[["test_data"]], formula, hyperparameters, cv_method = "standard")
+results1_under <- svm_grid_search(data_under[["train_data"]], data_under[["test_data"]], formula, hyperparameters, cv_method = "standard")
+results1_over <- svm_grid_search(data_over[["train_data"]], data_over[["test_data"]], formula, hyperparameters, cv_method = "standard")
+results1_smote <- svm_grid_search(data_smote[["train_data"]], data_smote[["test_data"]], formula, hyperparameters, cv_method = "standard")
+results1_pca <- svm_grid_search(data_pca[["train_data"]], data_pca[["test_data"]], formula, hyperparameters, cv_method = "standard")
+results1_white <- svm_grid_search(data_white[["train_data"]], data_white[["test_data"]], formula, hyperparameters, cv_method = "standard")
 
-# Accessing the LaTeX table for metrics and confusion matrix
-print(results1$metrics_table)
-print(results1$confusion_matrix)
-
-# Optionally, access the trained model
-best_model <- results1$model
 
 
 ##### exploring sigmoid kernel ----
 
-# Define a custom model
-train_svm_sigmoid <- function(train_data, test_data, formula) {
-  # Define the SVM model with Sigmoid Kernel
-  svmSigmoidModel <- list(
-    type = "Classification",
-    library = "e1071",
-    method = "svmSigmoid",
-    parameters = data.frame(parameter = c('cost', 'gamma'), class = c('numeric', 'numeric')),
-    grid = function(x, y, len = NULL, search = "grid") {
-      if (search == "grid") {
-        expand.grid(cost = 10^(-1:2), gamma = 10^(-2:1))
-      } else {
-        data.frame(cost = runif(30, -2, 2), gamma = runif(30, -2, 2))
-      }
-    },
-    fit = function(x, y, wts, param, lev, last, classProbs, ...) {
-      svm(x = x, y = y, kernel = "sigmoid", cost = param$cost, gamma = param$gamma, probability = TRUE, ...)
-    },
-    predict = function(modelFit, newdata, preProc = NULL, submodels = NULL) {
-      predict(modelFit, newdata)
-    },
-    prob = function(modelFit, newdata, preProc = NULL, submodels = NULL) {
-      preds <- predict(modelFit, newdata, probability = TRUE)
-      attr(preds, "probabilities")
-    },
-    levels = function(x) levels(x$y),
-    tags = c("SVM", "Kernel", "Sigmoid")
-  )
-  
-  # Define the control using a cross-validation approach
-  train_control <- trainControl(
-    method = "cv",
-    number = 10,
-    summaryFunction = twoClassSummary,
-    classProbs = TRUE,
-    selectionFunction = "best"
-  )
-  
-  # Define the grid for tuning
-  grid <- svmSigmoidModel$grid(NULL, NULL, search = "grid")
-  
-  # Train the model with AUC as the metric
-  svm_model <- train(
-    formula,
-    data = train_data,
-    method = svmSigmoidModel,
-    trControl = train_control,
-    tuneGrid = grid,
-    preProcess = c("center", "scale"),
-    metric = "ROC"
-  )
-
-  # Get the best settings from the grid search results
-  best_settings <- svm_model$bestTune
-  
-  # Train the SVM model using the best settings
-  #1. best_svm_sigmoid <- svm(formula, data = train_data, kernel = "svmSigmoidModel", cost = best_settings$C, sigma = best_settings$sigma, probability = TRUE)
-  
-  #2. svm_model <- train(poor_20 ~ ., data = train_data, method = svmSigmoidModel,
-                     trControl = train_control, tuneGrid = grid, preProcess = c("center", "scale"),
-                     metric = "ROC")  # Specify ROC as the metric for model tuning
-  # Predict on test data using the best model
-  preds_class <- predict(best_svm_sigmoid, newdata = test_data, type = "response")
-  
-  
-  # Confusion Matrix
-  cm <- table(Actual = test_data$poor_20, Predicted = predicted_classes)
-  
-  # Calculate metrics
-  accuracy <- sum(diag(cm)) / sum(cm)
-  precision <- cm[2, 2] / sum(cm[, 2])
-  sensitivity <- cm[2, 2] / sum(cm[2, ])
-  f1_score <- 2 * ((precision * sensitivity) / (precision + sensitivity))
-  roc_obj <- roc(as.numeric(test_data$poor_20 == "Class1"), preds_prob[, "Class1"])
-  auc <- auc(roc_obj)
-  
-  # Output results
-  metrics_table <- data.frame(
-    Accuracy = accuracy,
-    Precision = precision,
-    Sensitivity = sensitivity,
-    F1_Score = f1_score,
-    AUC = as.numeric(auc)
-  )
-  
-  # Return structured results
-  return(list(
-    metrics_table = metrics_table,
-    confusion_matrix = cm,
-    model = svm_model
-  ))
-}
-
-# Usage:
-results <- train_svm_sigmoid(train_data, test_data, poor_20 ~ .)
-print(results$metrics_table)
-print(results$confusion_matrix)
+# # Define a custom model
+# train_svm_sigmoid <- function(train_data, test_data, formula) {
+#   # Define the SVM model with Sigmoid Kernel
+#   svmSigmoidModel <- list(
+#     type = "Classification",
+#     library = "e1071",
+#     method = "svmSigmoid",
+#     parameters = data.frame(parameter = c('cost', 'gamma'), class = c('numeric', 'numeric')),
+#     grid = function(x, y, len = NULL, search = "grid") {
+#       if (search == "grid") {
+#         expand.grid(cost = 10^(-1:2), gamma = 10^(-2:1))
+#       } else {
+#         data.frame(cost = runif(30, -2, 2), gamma = runif(30, -2, 2))
+#       }
+#     },
+#     fit = function(x, y, wts, param, lev, last, classProbs, ...) {
+#       svm(x = x, y = y, kernel = "sigmoid", cost = param$cost, gamma = param$gamma, probability = TRUE, ...)
+#     },
+#     predict = function(modelFit, newdata, preProc = NULL, submodels = NULL) {
+#       predict(modelFit, newdata, probability = FALSE)
+#     },
+#     prob = function(modelFit, newdata, preProc = NULL, submodels = NULL) {
+#       preds <- predict(modelFit, newdata, probability = TRUE)
+#       attr(preds, "probabilities")
+#     },
+#     levels = function(x) levels(x$y),
+#     tags = c("SVM", "Kernel", "Sigmoid")
+#   )
+#   
+#   # Define the control using a cross-validation approach
+#   train_control <- trainControl(
+#     method = "cv",
+#     number = 10,
+#     summaryFunction = twoClassSummary,
+#     classProbs = TRUE,
+#     selectionFunction = "best"
+#   )
+#   
+#   # Define the grid for tuning
+#   grid <- svmSigmoidModel$grid(NULL, NULL, search = "grid")
+#   
+#   # Train the model with AUC as the metric
+#   svm_model <- train(
+#     formula,
+#     data = train_data,
+#     trControl = train_control,
+#     tuneGrid = grid,
+#     preProcess = c("center", "scale"),
+#     metric = "ROC",
+#     method = "svm",
+#     kernel = "sigmoid"
+#   )
+#   
+#   # Get the best settings from the grid search results
+#   best_settings <- svm_model$bestTune
+#   
+#   # Predict on test data using the best model
+#   preds_prob <- predict(svm_model, newdata = test_data, type = "prob")
+#   preds_class <- predict(svm_model, newdata = test_data, type = "raw")
+#   
+#   # Confusion Matrix
+#   cm <- table(Actual = test_data$poor_20, Predicted = preds_class)
+#   
+#   # Calculate metrics
+#   accuracy <- sum(diag(cm)) / sum(cm)
+#   precision <- cm[2, 2] / sum(cm[, 2])
+#   sensitivity <- cm[2, 2] / sum(cm[2, ])
+#   f1_score <- 2 * ((precision * sensitivity) / (precision + sensitivity))
+#   roc_obj <- roc(response = as.numeric(test_data$poor_20 == "Class1"), predictor = preds_prob[, "Class1"])
+#   auc <- auc(roc_obj)
+#   
+#   # Output results
+#   metrics_table <- data.frame(
+#     Accuracy = accuracy,
+#     Precision = precision,
+#     Sensitivity = sensitivity,
+#     F1_Score = f1_score,
+#     AUC = as.numeric(auc)
+#   )
+#   
+#   # Return structured results
+#   return(list(
+#     metrics_table = metrics_table,
+#     confusion_matrix = cm,
+#     model = svm_model
+#   ))
+# }
+# 
+# # Usage:
+# results <- train_svm_sigmoid(train_data, test_data, poor_20 ~ .)
+# print(results$metrics_table)
+# print(results$confusion_matrix)
 
 
 ### XGBoost ----
